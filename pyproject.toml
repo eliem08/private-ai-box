@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "private-ai-box"
+version = "0.1.0"
+description = "Dell for private AI: AI in a box for firms that will not use the cloud"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+dependencies = []
+
+[project.scripts]
+private-ai-box = "private_ai_box.__main__:main"
+
+[tool.setuptools]
+packages = ["private_ai_box"]
