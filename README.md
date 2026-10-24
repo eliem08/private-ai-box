@@ -1,5 +1,7 @@
 # private-ai-box
 
+[![CI](https://github.com/eliem08/private-ai-box/actions/workflows/ci.yml/badge.svg)](https://github.com/eliem08/private-ai-box/actions/workflows/ci.yml)
+
 > **Dell for private AI** — AI in a box for firms that won't use the cloud.
 
 Law firms, clinics, defence suppliers and banks want LLMs but won't send data
@@ -38,3 +40,25 @@ Prices are placeholder list prices; update `GPUS` with your distributor's quotes
 - Pre-imaged OS with model server, RAG over SMB shares, SSO, audit logging
 - Remote health monitoring without data egress (metrics only)
 - Leasing / financing calculator, 3-year TCO vs. API spend
+
+## Development
+
+Zero runtime dependencies; Python 3.10+.
+
+```bash
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e ".[dev]"
+python -m unittest discover -s tests -t .           # unit + CLI smoke tests
+ruff check . && ruff format --check .               # lint + format
+```
+
+```
+private_ai_box/core.py       domain logic (pure, importable, fully tested)
+private_ai_box/__main__.py   CLI (`private-ai-box ...` / `python -m private_ai_box ...`)
+tests/                unit tests + generated CLI smoke tests
+```
+
+CI runs lint and tests on Ubuntu and Windows across Python 3.10, 3.12 and 3.13.
+Design, data model, trade-offs and production path: **[ARCHITECTURE.md](ARCHITECTURE.md)**.
+
+Part of the [agent-economy](https://github.com/eliem08/agent-economy) portfolio (idea #17).

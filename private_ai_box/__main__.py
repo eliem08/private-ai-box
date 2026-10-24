@@ -33,7 +33,9 @@ def main(argv=None):
         return 1
     print(f"{'option':<28}{'VRAM':>12}{'tok/s/user':>12}{'GPU cost':>12}")
     for o in opts:
-        print(f"{o['count']} x {o['gpu']:<24}{o['vram_total']:>6}/{o['vram_needed']:<5}{o['tps_per_user']:>12}{o['gpu_cost']:>12,}")
+        print(
+            f"{o['count']} x {o['gpu']:<24}{o['vram_total']:>6}/{o['vram_needed']:<5}{o['tps_per_user']:>12}{o['gpu_cost']:>12,}"
+        )
     b = bom(opts[0], a.compliance)
     print(f"\nRecommended BOM ({opts[0]['sequences']} concurrent sequences):")
     for item, price in b["lines"]:

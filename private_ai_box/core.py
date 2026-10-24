@@ -1,10 +1,22 @@
 """Sizing math and configurator for on-prem LLM appliances."""
+
 from __future__ import annotations
 
 import math
 from dataclasses import dataclass
 
-__all__ = ["ModelSpec", "GPU", "MODELS", "GPUS", "QUANT_BYTES", "vram_needed", "decode_tps", "configure", "bom", "COMPLIANCE"]
+__all__ = [
+    "ModelSpec",
+    "GPU",
+    "MODELS",
+    "GPUS",
+    "QUANT_BYTES",
+    "vram_needed",
+    "decode_tps",
+    "configure",
+    "bom",
+    "COMPLIANCE",
+]
 
 QUANT_BYTES = {"fp16": 2.0, "int8": 1.0, "int4": 0.5}
 KV_BYTES = 2.0  # fp16 KV cache
@@ -48,11 +60,22 @@ GPUS = [
 ]
 
 COMPLIANCE = {
-    "air_gapped": ["No WAN route from model server VLAN", "Offline model + update media with checksum verification",
-                   "Disable telemetry in OS, drivers and model server"],
-    "hipaa": ["Full-disk encryption (LUKS) with TPM unlock", "Per-user SSO + MFA", "Audit log of prompts/responses retained 6 years",
-              "BAA with the integrator for on-site service"],
-    "soc2": ["Change management for model/config updates", "Quarterly access review", "Backups of RAG index and configs, tested restore"],
+    "air_gapped": [
+        "No WAN route from model server VLAN",
+        "Offline model + update media with checksum verification",
+        "Disable telemetry in OS, drivers and model server",
+    ],
+    "hipaa": [
+        "Full-disk encryption (LUKS) with TPM unlock",
+        "Per-user SSO + MFA",
+        "Audit log of prompts/responses retained 6 years",
+        "BAA with the integrator for on-site service",
+    ],
+    "soc2": [
+        "Change management for model/config updates",
+        "Quarterly access review",
+        "Backups of RAG index and configs, tested restore",
+    ],
 }
 
 
@@ -73,8 +96,15 @@ def decode_tps(m: ModelSpec, quant: str, gpu: GPU, count: int) -> float:
     return gpu.bandwidth_gbs * BW_EFFICIENCY * scale / bytes_per_token
 
 
-def configure(model: str, quant: str, users: int, concurrency: float, context: int, tps_per_user: float,
-              datacenter_only: bool = False) -> list[dict]:
+def configure(
+    model: str,
+    quant: str,
+    users: int,
+    concurrency: float,
+    context: int,
+    tps_per_user: float,
+    datacenter_only: bool = False,
+) -> list[dict]:
     m = MODELS[model]
     seqs = max(1, math.ceil(users * concurrency))
     need = vram_needed(m, quant, context, seqs)
@@ -90,8 +120,17 @@ def configure(model: str, quant: str, users: int, concurrency: float, context: i
             per_user = decode_tps(m, quant, g, count) * batch_gain / seqs
             if per_user < tps_per_user:
                 continue
-            options.append({"gpu": g.name, "count": count, "vram_total": g.vram_gb * count, "vram_needed": round(need, 1),
-                            "tps_per_user": round(per_user, 1), "gpu_cost": g.price * count, "sequences": seqs})
+            options.append(
+                {
+                    "gpu": g.name,
+                    "count": count,
+                    "vram_total": g.vram_gb * count,
+                    "vram_needed": round(need, 1),
+                    "tps_per_user": round(per_user, 1),
+                    "gpu_cost": g.price * count,
+                    "sequences": seqs,
+                }
+            )
             break
     return sorted(options, key=lambda o: o["gpu_cost"])
 
@@ -100,12 +139,19 @@ def bom(option: dict, compliance: list[str] | None = None) -> dict:
     n = option["count"]
     lines = [
         (f"{n} x {option['gpu']}", option["gpu_cost"]),
-        ("Chassis + PSU" + (" (4U, 8-slot)" if n > 4 else " (4U, 4-slot)" if n > 1 else " (tower)"), 1500 if n == 1 else 3500 if n <= 4 else 9000),
+        (
+            "Chassis + PSU" + (" (4U, 8-slot)" if n > 4 else " (4U, 4-slot)" if n > 1 else " (tower)"),
+            1500 if n == 1 else 3500 if n <= 4 else 9000,
+        ),
         (f"CPU ({max(16, 8 * n)} cores) + {max(128, 64 * n)} GB RAM", 1200 + 250 * n),
         (f"{max(2, n)} TB NVMe (models + RAG index)", 150 * max(2, n)),
         ("Line-interactive UPS", 600 if n <= 2 else 1500),
         ("Imaging, burn-in, on-site install", 2500),
     ]
     total = sum(p for _, p in lines)
-    return {"lines": lines, "total": total, "suggested_price": round(total * 1.35, -2),
-            "compliance": {c: COMPLIANCE[c] for c in (compliance or [])}}
+    return {
+        "lines": lines,
+        "total": total,
+        "suggested_price": round(total * 1.35, -2),
+        "compliance": {c: COMPLIANCE[c] for c in (compliance or [])},
+    }
