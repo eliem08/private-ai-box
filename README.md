@@ -22,6 +22,18 @@ private-ai-box gpus
 private-ai-box size --users 40 --concurrency 0.25 --model 32b --quant int4 --compliance hipaa
 ```
 
+## Web app and API
+
+Every command is also a JSON API endpoint and a browser form, served by the built-in web app.
+
+```bash
+private-ai-box-web --port 8000          # then open http://127.0.0.1:8000
+docker build -t private-ai-box . && docker run -p 8000:8000 -v private-ai-box-data:/data private-ai-box
+```
+
+Endpoints: `POST /api/size`, `POST /api/models`, `POST /api/gpus`, plus `GET /healthz` and `GET /api/spec` (machine-readable field list).
+Files are sent as `{"name": ..., "content": ...}`, folders as `{"files": [...]}` or a base64 zip.
+
 ## Pricing
 
 Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless noted.

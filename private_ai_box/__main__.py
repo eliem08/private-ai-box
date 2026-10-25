@@ -15,7 +15,7 @@ def _finite_float(s: str) -> float:
     return v
 
 
-def _run(argv=None):
+def build_parser():
     ap = argparse.ArgumentParser(prog="private-ai-box")
     sub = ap.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("size")
@@ -29,6 +29,11 @@ def _run(argv=None):
     s.add_argument("--compliance", nargs="*", default=[], choices=sorted(COMPLIANCE))
     sub.add_parser("models")
     sub.add_parser("gpus")
+    return ap
+
+
+def _run(argv=None):
+    ap = build_parser()
     a = ap.parse_args(argv)
     if a.cmd == "models":
         for m in MODELS.values():

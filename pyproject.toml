@@ -23,6 +23,7 @@ dev = ["ruff>=0.6"]
 
 [project.scripts]
 private-ai-box = "private_ai_box.__main__:main"
+private-ai-box-web = "private_ai_box.web:main"
 
 [project.urls]
 Repository = "https://github.com/eliem08/private-ai-box"

@@ -1,0 +1,24 @@
+[
+ {
+  "op": "models",
+  "payload": {}
+ },
+ {
+  "op": "gpus",
+  "payload": {}
+ },
+ {
+  "op": "size",
+  "payload": {
+   "users": 40,
+   "concurrency": 0.25,
+   "model": "32b",
+   "quant": "int4",
+   "context": 8192,
+   "tps": 15,
+   "compliance": [
+    "hipaa"
+   ]
+  }
+ }
+]
