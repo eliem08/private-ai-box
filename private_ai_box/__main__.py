@@ -1,19 +1,30 @@
 import argparse
+import csv
+import math
+import os
 import sys
 
 from .core import COMPLIANCE, GPUS, MODELS, QUANT_BYTES, bom, configure
 
 
-def main(argv=None):
+def _finite_float(s: str) -> float:
+    """argparse type: a float that is not nan/inf, so limits and prices cannot be bypassed."""
+    v = float(s)
+    if not math.isfinite(v):
+        raise argparse.ArgumentTypeError(f"must be a finite number, got {s!r}")
+    return v
+
+
+def _run(argv=None):
     ap = argparse.ArgumentParser(prog="private-ai-box")
     sub = ap.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("size")
     s.add_argument("--users", type=int, required=True)
-    s.add_argument("--concurrency", type=float, default=0.2, help="share of users generating at once")
+    s.add_argument("--concurrency", type=_finite_float, default=0.2, help="share of users generating at once")
     s.add_argument("--model", choices=sorted(MODELS), default="32b")
     s.add_argument("--quant", choices=sorted(QUANT_BYTES), default="int4")
     s.add_argument("--context", type=int, default=8192)
-    s.add_argument("--tps", type=float, default=15, help="target tokens/s per active user")
+    s.add_argument("--tps", type=_finite_float, default=15, help="target tokens/s per active user")
     s.add_argument("--datacenter", action="store_true")
     s.add_argument("--compliance", nargs="*", default=[], choices=sorted(COMPLIANCE))
     sub.add_parser("models")
@@ -46,6 +57,23 @@ def main(argv=None):
         for i in items:
             print(f"  [ ] {i}")
     return 0
+
+
+def main(argv=None):
+    """Run the CLI; a bad input file or argument exits 2 with a one-line error instead of a traceback.
+
+    Set AGENT_ECONOMY_DEBUG=1 to see the full traceback.
+    """
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="replace")
+    try:
+        return _run(argv)
+    except (OSError, ValueError, KeyError, csv.Error) as e:
+        if os.environ.get("AGENT_ECONOMY_DEBUG"):
+            raise
+        msg = e.args[0] if isinstance(e, KeyError) and e.args else e
+        print(f"error: {msg}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":
