@@ -1,4 +1,4 @@
-"""Dell for private AI: AI in a box for firms that will not use the cloud."""
+"""Private AI Box: Spec an on-prem AI server for firms that cannot use the cloud."""
 
 from .core import *
 

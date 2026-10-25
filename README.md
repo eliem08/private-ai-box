@@ -1,16 +1,45 @@
-# private-ai-box
+<!-- sell-kit:start -->
+# Private AI Box
 
 [![CI](https://github.com/eliem08/private-ai-box/actions/workflows/ci.yml/badge.svg)](https://github.com/eliem08/private-ai-box/actions/workflows/ci.yml)
 
-> **Dell for private AI** — AI in a box for firms that won't use the cloud.
+> **Spec an on-prem AI server for firms that cannot use the cloud.**
 
-Law firms, clinics, defence suppliers and banks want LLMs but won't send data
-to a cloud API. They need a box in the closet that just works. The hard part
-of selling that box is sizing it: which model, which GPUs, how many users.
-`private-ai-box` is the configurator that turns requirements into a bill of
-materials.
+**Who it's for:** Law, medical and finance firms, and the integrators who sell to them.
 
-## What the MVP does
+**The problem:** Regulated firms want private AI but can't size GPUs, VRAM and throughput, so they overspend or buy boxes that are too slow.
+
+**What you get:** Size VRAM, KV cache and throughput for your users and model, pick the cheapest GPU configuration that fits, and output a bill of materials with compliance checklists.
+
+## Quickstart
+
+Customers receive a release archive with the wheel and the examples. Python 3.10+ and no other dependencies.
+
+```bash
+pip install private_ai_box-0.1.0-py3-none-any.whl
+private-ai-box models
+private-ai-box gpus
+private-ai-box size --users 40 --concurrency 0.25 --model 32b --quant int4 --compliance hipaa
+```
+
+## Pricing
+
+Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless noted.
+
+| Plan | Price | Includes |
+|---|---|---|
+| **Integrator** | $99 per month | Unlimited configurations; BOM and price; Compliance packs |
+| **Reseller** | $399 per month | Branded quotes; Custom hardware catalog; Margin controls |
+| **Turnkey box** | Custom (quoted per build) | Built, imaged and installed on site; HIPAA and SOC 2 packs; Support contract |
+
+To start a trial or buy a plan, email **sales@YOUR-DOMAIN.com**.
+
+## Licence
+
+Proprietary. Copyright (c) 2026 eliem08. All rights reserved. Use requires a paid plan or an active trial; see [LICENSE](LICENSE).
+<!-- sell-kit:end -->
+
+## What it does
 
 - **Model catalogue** (8B / 32B / 70B dense classes + MoE) with layer and
   KV-head geometry

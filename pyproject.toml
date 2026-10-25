@@ -5,16 +5,17 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "private-ai-box"
 version = "0.1.0"
-description = "Dell for private AI: AI in a box for firms that will not use the cloud"
+description = "Spec an on-prem AI server for firms that cannot use the cloud."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = { text = "Proprietary" }
 authors = [{ name = "eliem08" }]
 dependencies = []
 classifiers = [
   "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: MIT License",
+  "License :: Other/Proprietary License",
   "Operating System :: OS Independent",
+  "Private :: Do Not Upload",
 ]
 
 [project.optional-dependencies]
