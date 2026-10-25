@@ -33,6 +33,16 @@ class Tests(unittest.TestCase):
         self.assertGreater(b["suggested_price"], b["total"])
         self.assertIn("hipaa", b["compliance"])
 
+    def test_inputs_that_would_undersize_the_box_are_rejected(self):
+        for args in (
+            ("8b", "int8", 5, 0.2, 0, 20),  # context 0 drops the KV cache
+            ("8b", "int8", 5, 3.0, 4096, 20),  # 300% of users generating at once
+            ("8b", "int8", 0, 0.2, 4096, 20),
+            ("8b", "int8", 5, 0.2, 4096, float("nan")),
+        ):
+            with self.subTest(args=args), self.assertRaises(ValueError):
+                configure(*args)
+
 
 if __name__ == "__main__":
     unittest.main()

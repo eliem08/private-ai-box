@@ -105,6 +105,12 @@ def configure(
     tps_per_user: float,
     datacenter_only: bool = False,
 ) -> list[dict]:
+    if users < 1 or context < 1:
+        raise ValueError("need users >= 1 and context >= 1 token")  # context 0 drops the KV cache from sizing
+    if not (math.isfinite(concurrency) and 0 < concurrency <= 1):
+        raise ValueError("concurrency is the share of users generating at once: 0 < concurrency <= 1")
+    if not (math.isfinite(tps_per_user) and tps_per_user > 0):
+        raise ValueError("tps_per_user must be a finite number > 0")
     m = MODELS[model]
     seqs = max(1, math.ceil(users * concurrency))
     need = vram_needed(m, quant, context, seqs)
