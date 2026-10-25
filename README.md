@@ -47,7 +47,7 @@ Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless
 | **Reseller** | $399 per month | Branded quotes; Custom hardware catalog; Margin controls |
 | **Turnkey box** | Custom (quoted per build) | Built, imaged and installed on site; HIPAA and SOC 2 packs; Support contract |
 
-To start a trial or buy a plan, email **sales@YOUR-DOMAIN.com**.
+To start a trial or buy a plan, [request access](https://github.com/eliem08/private-ai-box/issues/new?title=Private%20AI%20Box%20trial&labels=sales).
 
 ## Licence
 
