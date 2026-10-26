@@ -16,6 +16,9 @@ __all__ = [
     "configure",
     "bom",
     "COMPLIANCE",
+    "PRICES_AS_OF",
+    "load_prices",
+    "price_age_days",
 ]
 
 QUANT_BYTES = {"fp16": 2.0, "int8": 1.0, "int4": 0.5}
@@ -58,6 +61,49 @@ GPUS = [
     GPU("A100 80GB", 80, 2039, 15000, True),
     GPU("H100 80GB", 80, 3350, 28000, True),
 ]
+PRICES_AS_OF = "2026-10-01"  # street prices for GPUS above; refresh, or pass a price file
+STALE_AFTER_DAYS = 90
+
+
+def load_prices(path: str) -> tuple[list[GPU], str]:
+    """Merge a reseller price file into the built-in GPU list.
+
+    {"as_of": "2026-11-15", "gpus": [{"name": "H100 80GB", "price": 26500},
+     {"name": "B200 192GB", "vram_gb": 192, "bandwidth_gbs": 8000, "price": 38000, "datacenter": true}]}
+    A known name with only a price updates it; an unknown name must carry every field.
+    """
+    import datetime
+    import json
+
+    with open(path, encoding="utf-8-sig") as fh:
+        doc = json.load(fh)
+    if not isinstance(doc, dict) or not isinstance(doc.get("gpus"), list):
+        raise ValueError(f"{path}: expected {{'as_of': 'YYYY-MM-DD', 'gpus': [...]}}")
+    as_of = str(doc.get("as_of", ""))
+    datetime.date.fromisoformat(as_of)  # ValueError on a missing or malformed date
+    by_name = {g.name: g for g in GPUS}
+    for row in doc["gpus"]:
+        name = row.get("name") if isinstance(row, dict) else None
+        price = row.get("price") if isinstance(row, dict) else None
+        if not name or not isinstance(price, (int, float)) or not math.isfinite(price) or price <= 0:
+            raise ValueError(f"{path}: every gpu needs a name and a positive price: {row!r:.80}")
+        old = by_name.get(name)
+        if old and set(row) <= {"name", "price"}:
+            by_name[name] = GPU(name, old.vram_gb, old.bandwidth_gbs, int(price), old.datacenter)
+            continue
+        try:
+            vram, bw = int(row["vram_gb"]), float(row["bandwidth_gbs"])
+        except (KeyError, TypeError, ValueError):
+            raise ValueError(f"{path}: new gpu {name!r} needs vram_gb and bandwidth_gbs") from None
+        by_name[name] = GPU(name, vram, bw, int(price), bool(row.get("datacenter", False)))
+    return list(by_name.values()), as_of
+
+
+def price_age_days(as_of: str, today=None) -> int:
+    import datetime
+
+    return ((today or datetime.date.today()) - datetime.date.fromisoformat(as_of)).days
+
 
 COMPLIANCE = {
     "air_gapped": [
@@ -104,6 +150,7 @@ def configure(
     context: int,
     tps_per_user: float,
     datacenter_only: bool = False,
+    gpus: list[GPU] | None = None,
 ) -> list[dict]:
     if users < 1 or context < 1:
         raise ValueError("need users >= 1 and context >= 1 token")  # context 0 drops the KV cache from sizing
@@ -115,7 +162,7 @@ def configure(
     seqs = max(1, math.ceil(users * concurrency))
     need = vram_needed(m, quant, context, seqs)
     options = []
-    for g in GPUS:
+    for g in gpus or GPUS:
         if datacenter_only and not g.datacenter:
             continue
         for count in (1, 2, 4, 8):

@@ -20,5 +20,21 @@
     "hipaa"
    ]
   }
+ },
+ {
+  "op": "size",
+  "payload": {
+   "users": 200,
+   "concurrency": 0.2,
+   "model": "70b",
+   "quant": "int4",
+   "context": 8192,
+   "tps": 15,
+   "datacenter": true,
+   "prices": {
+    "name": "reseller-prices.json",
+    "content": "{\n  \"as_of\": \"2026-10-20\",\n  \"gpus\": [\n    {\"name\": \"H100 80GB\", \"price\": 26500},\n    {\"name\": \"B200 192GB\", \"vram_gb\": 192, \"bandwidth_gbs\": 8000, \"price\": 38000, \"datacenter\": true}\n  ]\n}\n"
+   }
+  }
  }
 ]
