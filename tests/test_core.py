@@ -33,6 +33,15 @@ class Tests(unittest.TestCase):
         self.assertGreater(b["suggested_price"], b["total"])
         self.assertIn("hipaa", b["compliance"])
 
+    def test_margin_controls_suggested_price(self):
+        opts = configure("8b", "int8", 5, 0.2, 4096, 20)
+        b = bom(opts[0], margin=1.5)
+        self.assertEqual(b["suggested_price"], round(b["total"] * 1.5, -2))
+        with self.assertRaises(ValueError):
+            bom(opts[0], margin=0)
+        with self.assertRaises(ValueError):
+            bom(opts[0], margin=float("nan"))
+
     def test_inputs_that_would_undersize_the_box_are_rejected(self):
         for args in (
             ("8b", "int8", 5, 0.2, 0, 20),  # context 0 drops the KV cache

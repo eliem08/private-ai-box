@@ -20,6 +20,7 @@ pip install private_ai_box-0.1.0-py3-none-any.whl
 private-ai-box models
 private-ai-box gpus
 private-ai-box size --users 40 --concurrency 0.25 --model 32b --quant int4 --compliance hipaa
+private-ai-box size --users 40 --concurrency 0.25 --model 32b --quant int4 --margin 1.5
 ```
 
 ## Web app and API
@@ -48,7 +49,7 @@ To sell self-serve, set four variables and point a Stripe webhook at `https://<y
 |---|---|
 | `STRIPE_SECRET_KEY` | `sk_live_...` |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` |
-| `STRIPE_PRICES` | `team=price_123,business=price_456` |
+| `STRIPE_PRICES` | `integrator=price_123,reseller=price_456` |
 | `PUBLIC_URL` | `https://private-ai-box.example.com` |
 
 Buyers pick a plan on `/pricing`, pay on Stripe Checkout and see their API key once on the success page. Cancelling the subscription revokes the key. A selling server always requires a key.
@@ -60,10 +61,12 @@ Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless
 | Plan | Price | Includes |
 |---|---|---|
 | **Integrator** | $99 per month | Unlimited configurations; BOM and price; Compliance packs |
-| **Reseller** | $399 per month | Branded quotes; Custom hardware catalog; Margin controls |
-| **Turnkey box** | Custom (quoted per build) | Built, imaged and installed on site; HIPAA and SOC 2 packs; Support contract |
+| **Reseller** | $399 per month | Everything in Integrator; Custom hardware catalog; Margin controls |
+| **Turnkey box** | Custom (quoted per build) | Everything in Reseller; Built, imaged and installed on site; Support contract |
 
 To start a trial or buy a plan, [request access](https://github.com/eliem08/private-ai-box/issues/new?title=Private%20AI%20Box%20trial&labels=sales).
+
+Plan note, owner decision on merge: there is no feature gating by plan in the code — every API key unlocks the same software (size, models, gpus, custom price files, margin control). Reseller's branded quotes are not built and have been removed from the sales copy; margin control is now real via `--margin` (default 1.35, e.g. 1.5 = 50% margin on BOM cost). Turnkey box is a human build/install service, not a Stripe plan, so the STRIPE_PRICES example only lists integrator/reseller.
 
 ## Licence
 
@@ -110,6 +113,7 @@ python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\act
 pip install -e ".[dev]"
 python -m unittest discover -s tests -t .           # unit + CLI smoke tests
 ruff check . && ruff format --check .               # lint + format
+python -m pip wheel . --no-deps -w dist            # customer wheel, as in Quickstart
 ```
 
 ```
