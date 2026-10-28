@@ -38,3 +38,21 @@ update bundles.
 ## 5. Risks
 Hardware supply and price volatility, so quotes expire after 7 days. Model licence terms for
 commercial on-prem use are checked per model in the catalogue.
+
+## 6. Limitations (sell-ready audit, 2026-10-28)
+- No feature gating by plan: every API key unlocks the same software. Reseller's
+  branded quotes are not built and were removed from sales copy; margin control
+  is now real via `--margin` (default 1.35) on the BOM suggested price.
+- GPU prices are placeholder list prices as of 2026-10-01 (27 days old at audit
+  time, under the 90-day staleness warning); real quotes must come from a
+  distributor price file via `--prices`, as in examples/reseller-prices.json.
+  Sizing is first-principles math (bandwidth-bound decode, 0.6 efficiency,
+  85% tensor-parallel scaling), not measured benchmarks for the buyer's exact
+  model and cards.
+- Docker build and a live Render/Fly deployment were not verified in the audit
+  environment (no Docker binary there); Dockerfile, render.yaml, and fly.toml are
+  the same template shape as vibe-lube, but a deployment claim remains
+  "not verified" until one is made.
+- Stripe prices were not verified against a live Stripe account in this run;
+  checkout and revocation are covered in tests with mocked Stripe calls, and the
+  README example now uses integrator/reseller plan keys to match the plan names.

@@ -40,6 +40,12 @@ def build_parser():
     s.add_argument("--compliance", nargs="*", default=[], choices=sorted(COMPLIANCE))
     prices_help = "JSON price file to override or add GPUs (see README)"
     s.add_argument("--prices", help=prices_help)
+    s.add_argument(
+        "--margin",
+        type=_finite_float,
+        default=1.35,
+        help="suggested-price multiplier on BOM cost, e.g. 1.5 = 50% margin (default 1.35)",
+    )
     sub.add_parser("models")
     sub.add_parser("gpus").add_argument("--prices", help=prices_help)
     return ap
@@ -71,7 +77,7 @@ def _run(argv=None):
         print(
             f"{o['count']} x {o['gpu']:<24}{o['vram_total']:>6}/{o['vram_needed']:<5}{o['tps_per_user']:>12}{o['gpu_cost']:>12,}"
         )
-    b = bom(opts[0], a.compliance)
+    b = bom(opts[0], a.compliance, a.margin)
     print(f"\nRecommended BOM ({opts[0]['sequences']} concurrent sequences):")
     for item, price in b["lines"]:
         print(f"  {item:<48} ${price:>8,}")

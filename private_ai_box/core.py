@@ -188,7 +188,9 @@ def configure(
     return sorted(options, key=lambda o: o["gpu_cost"])
 
 
-def bom(option: dict, compliance: list[str] | None = None) -> dict:
+def bom(option: dict, compliance: list[str] | None = None, margin: float = 1.35) -> dict:
+    if not math.isfinite(margin) or margin <= 0:
+        raise ValueError(f"margin must be a finite number > 0, got {margin!r}")
     n = option["count"]
     lines = [
         (f"{n} x {option['gpu']}", option["gpu_cost"]),
@@ -205,6 +207,6 @@ def bom(option: dict, compliance: list[str] | None = None) -> dict:
     return {
         "lines": lines,
         "total": total,
-        "suggested_price": round(total * 1.35, -2),
+        "suggested_price": round(total * margin, -2),
         "compliance": {c: COMPLIANCE[c] for c in (compliance or [])},
     }
