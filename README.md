@@ -81,7 +81,8 @@ Proprietary. Copyright (c) 2026 eliem08. All rights reserved. Use requires a pai
   (`2 × layers × kv_heads × head_dim × bytes × context × concurrent users`) + overhead
 - **Throughput math**: decode is memory-bandwidth bound →
   `tokens/s ≈ bandwidth × efficiency / active_bytes_per_token`, shared across users
-- **GPU catalogue** (workstation and datacenter cards, list-price placeholders)
+- **GPU catalogue** (workstation and datacenter cards) with dated street prices; quotes warn when
+  prices are over 90 days old, and `--prices FILE` overrides them or adds new GPUs
 - **Configurator**: cheapest GPU × count that fits VRAM *and* hits the
   per-user tokens/s target (tensor-parallel up to 8 GPUs)
 - **BOM**: GPUs, chassis, CPU/RAM/NVMe sized from GPU count, UPS, plus a
