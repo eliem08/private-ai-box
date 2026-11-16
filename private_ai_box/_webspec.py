@@ -132,4 +132,24 @@ SPEC = {
             "id": "gpus",
         },
     ],
+    "plans": [
+        {
+            "key": "integrator",
+            "name": "Integrator",
+            "price": "$99 per month",
+            "features": ["Unlimited configurations", "BOM and price", "Compliance packs"],
+        },
+        {
+            "key": "reseller",
+            "name": "Reseller",
+            "price": "$399 per month",
+            "features": ["Your own price file", "Custom hardware catalog", "Hosted API"],
+        },
+        {
+            "key": "turnkey-box",
+            "name": "Turnkey box",
+            "price": "Quoted per build",
+            "features": ["Built, imaged and installed on site", "HIPAA and SOC 2 packs", "Support contract"],
+        },
+    ],
 }
